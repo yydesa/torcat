@@ -4,7 +4,7 @@ import (
 	"conntools"
 	"golang.org/x/net/proxy"
 	"net"
-	"os"
+	"flag"
 )
 
 // I suppose there is something easier for this wrappering,
@@ -17,13 +17,16 @@ func (m MD) Dial(network, addr string) (c net.Conn, err error) {
 	return net.Dial(network, addr)
 }
 
+var addr = flag.String("socks", "127.0.0.1:9050", "socks addr")
+
 func main() {
-	args := os.Args[1:]
-	if len(args) < 1 {
-		panic("No destination")
+	flag.Parse ()
+	args := flag.Args ()
+	if len(args) != 1 {
+		panic("Not a single destination")
 	}
 	host := args[0]
-	d, err := proxy.SOCKS5("tcp", "127.0.0.1:9150", nil, MD{})
+	d, err := proxy.SOCKS5("tcp", *addr, nil, MD{})
 	if err != nil {
 		panic("failed to make dialer: " + err.Error())
 	}
